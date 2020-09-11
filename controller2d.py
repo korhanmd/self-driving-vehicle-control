@@ -189,18 +189,28 @@ class Controller2D(object):
             # Look ahead distance
             l_d = 20
 
+            # Coefficient to use vehicle speed to replace look ahead distance
+            K_dd = 1
+
+            # Use look ahead distance for lower speed
+            denominator = np.maximum(l_d, K_dd*self._current_speed) 
+
+            # Choose last waypoint as initial target
             idx = len(self._waypoints) - 1
 
+            # Find the nearest waypoint that beyond the look ahead distance
             for i in range(len(self._waypoints)):
                 dist = np.sqrt((self._waypoints[i][0] - self._current_x)**2 + (self._waypoints[i][1] - self._current_y)**2)
-                if dist > l_d:
+                if dist > denominator:
                     idx = i
                     break
 
+            # Calculate alpha
             angle_to_target = np.arctan2(self._waypoints[idx][1] - self._current_y, self._waypoints[idx][0] - self._current_x)
             alpha = angle_to_target - self._current_yaw
 
-            steer_output = np.arctan(2*3*np.sin(alpha)/(l_d))
+            # Set steering angle
+            steer_output = np.arctan(2*3*np.sin(alpha)/denominator)
 
             ######################################################
             # SET CONTROLS OUTPUT

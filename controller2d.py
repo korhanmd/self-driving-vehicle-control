@@ -163,8 +163,15 @@ class Controller2D(object):
             # Change these outputs with the longitudinal controller. Note that
             # brake_output is optional and is not required to pass the
             # assignment, as the car will naturally slow down over time.
-            throttle_output = 0
+            #throttle_output = 1
             brake_output    = 0
+
+            if(self._current_speed < self._desired_speed):
+                throttle_output = 1
+            else:
+                throttle_output = 0
+
+            print(str(self._current_speed) + " " + str(self._desired_speed))
 
             ######################################################
             ######################################################

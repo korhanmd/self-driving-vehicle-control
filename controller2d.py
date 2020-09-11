@@ -184,22 +184,23 @@ class Controller2D(object):
                 example, can treat self.vars.v_previous like a "global variable".
             """
             
-            # Change the steer output with the lateral controller. 
+            # Change the steer output with the lateral controller.
 
-            l_d = 10
-            idx = len(self._waypoints)
+            # Look ahead distance
+            l_d = 20
+
+            idx = len(self._waypoints) - 1
 
             for i in range(len(self._waypoints)):
                 dist = np.sqrt((self._waypoints[i][0] - self._current_x)**2 + (self._waypoints[i][1] - self._current_y)**2)
                 if dist > l_d:
                     idx = i
-                    print(str(dist) + " " + str(idx))
                     break
 
             angle_to_target = np.arctan2(self._waypoints[idx][1] - self._current_y, self._waypoints[idx][0] - self._current_x)
             alpha = angle_to_target - self._current_yaw
 
-            steer_output = alpha
+            steer_output = np.arctan(2*3*np.sin(alpha)/(l_d))
 
             ######################################################
             # SET CONTROLS OUTPUT

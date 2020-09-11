@@ -171,7 +171,7 @@ class Controller2D(object):
             else:
                 throttle_output = 0
 
-            print(str(self._current_speed) + " " + str(self._desired_speed))
+            #print(str(self._current_speed) + " " + str(self._desired_speed))
 
             ######################################################
             ######################################################
@@ -185,7 +185,11 @@ class Controller2D(object):
             """
             
             # Change the steer output with the lateral controller. 
-            steer_output    = 0
+            #steer_output    = 0
+
+            steer_output = (self._waypoints[0][0]-self._current_x)/50
+
+            print(str(self._current_x) + " " + str(self._waypoints[0][0]))
 
             ######################################################
             # SET CONTROLS OUTPUT

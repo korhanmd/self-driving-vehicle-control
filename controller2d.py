@@ -114,6 +114,8 @@ class Controller2D(object):
             throttle_output = 0.5 * self.vars.v_previous
         """
         self.vars.create_var('v_previous', 0.0)
+        self.vars.create_var('e_previous', 0.0)
+        self.vars.create_var('e_total', 0.0)
 
         # Skip the first frame to store previous values properly
         if self._start_control_loop:
@@ -163,15 +165,30 @@ class Controller2D(object):
             # Change these outputs with the longitudinal controller. Note that
             # brake_output is optional and is not required to pass the
             # assignment, as the car will naturally slow down over time.
-            #throttle_output = 1
-            brake_output    = 0
 
-            if(self._current_speed < self._desired_speed):
-                throttle_output = 1
+            # PID parameters
+            K_p = 0.2
+            K_d = 0.05
+            K_i = 0.01
+
+            # Calculate velocity error
+            error_v = self._desired_speed - self._current_speed
+
+            # Integral of errors
+            self.vars.e_total += error_v
+
+            # Find target acceleration with PID
+            target_acc = K_p*(error_v) + K_i*self.vars.e_total + K_d*(error_v - self.vars.e_previous)
+
+            # If acceleration is positive open the throttle
+            # Else hit the break
+            if(target_acc < 0):
+                brake_output = np.absolute(target_acc)
             else:
-                throttle_output = 0
+                throttle_output = target_acc
 
-            #print(str(self._current_speed) + " " + str(self._desired_speed))
+            # Save previous velocity error
+            self.vars.e_previous = error_v
 
             ######################################################
             ######################################################
@@ -229,4 +246,4 @@ class Controller2D(object):
             current x, y, and yaw values here using persistent variables for use
             in the next iteration)
         """
-        self.vars.v_previous = v  # Store forward speed to be used in next step
+        self.vars.v_previous = self._current_speed  # Store forward speed to be used in next step
